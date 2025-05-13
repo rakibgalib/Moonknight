@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35122.118
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{67B8A24B-A440-442A-8600-A4774A0505F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoonKnight.Auth", "Servives\MoonKnight.Auth\MoonKnight.Auth.csproj", "{A9237195-1B2F-460E-AD98-0D76C438D68C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A9237195-1B2F-460E-AD98-0D76C438D68C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9237195-1B2F-460E-AD98-0D76C438D68C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9237195-1B2F-460E-AD98-0D76C438D68C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9237195-1B2F-460E-AD98-0D76C438D68C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A9237195-1B2F-460E-AD98-0D76C438D68C} = {67B8A24B-A440-442A-8600-A4774A0505F4}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C707B7A2-22A5-4652-B573-EADB3E6B89ED}
+	EndGlobalSection
+EndGlobal
