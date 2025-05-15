@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using MoonKnight.Auth.Dtos;
+using MoonKnight.Auth.Infrastructures.Services;
 
 namespace MoonKnight.Auth.Controllers
 {
@@ -16,10 +17,12 @@ namespace MoonKnight.Auth.Controllers
     public class AuthController : ControllerBase
     {
         private readonly MoonKnightDbContext _context;
-
-        public AuthController(MoonKnightDbContext context)
+        private readonly JwtTokenGenerator _jwtTokenGenerator;
+        public AuthController(MoonKnightDbContext context, JwtTokenGenerator jwtTokenGenerator)
         {
+
             _context = context;
+            _jwtTokenGenerator = jwtTokenGenerator;
         }
 
         // Registration endpoint
@@ -70,17 +73,17 @@ namespace MoonKnight.Auth.Controllers
 
             if (user == null)
             {
-                return Unauthorized("Invalid credentials");
+                return BadRequest(new ApiResponse<string>(false, "Invalid credentials"));
             }
 
             // Verify the password using BCrypt
             if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
             {
-                return Unauthorized("Invalid credentials");
+                return BadRequest(new ApiResponse<string>(false, "Invalid credentials"));
             }
+            var token = _jwtTokenGenerator.GenerateToken(user);
+            return Ok(new ApiResponse<string>(true, "Login successful", token));
 
-            // Generate JWT or session here (optional step)
-            return Ok(new { message = "Login successful" });
         }
 
         // Utility to hash the password (you can replace this with a more secure method like BCrypt in production)

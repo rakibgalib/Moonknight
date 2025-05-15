@@ -21,7 +21,6 @@
   <ItemGroup>
     <Folder Include="Domain\Enums\" />
     <Folder Include="Infrastructures\Migrations\" />
-    <Folder Include="Infrastructures\Services\" />
     <Folder Include="Middleware\" />
   </ItemGroup>
 

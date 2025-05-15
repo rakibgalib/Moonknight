@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MoonKnight.Auth.Infrastructures.DbContexts;
 
@@ -11,9 +12,11 @@ using MoonKnight.Auth.Infrastructures.DbContexts;
 namespace MoonKnight.Auth.Migrations
 {
     [DbContext(typeof(MoonKnightDbContext))]
-    partial class AuthDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250515165225_AddTenantIdToUser")]
+    partial class AddTenantIdToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
