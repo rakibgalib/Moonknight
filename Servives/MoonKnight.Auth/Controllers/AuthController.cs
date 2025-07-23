@@ -9,6 +9,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using MoonKnight.Auth.Dtos;
 using MoonKnight.Auth.Infrastructures.Services;
+using AutoMapper;
 
 namespace MoonKnight.Auth.Controllers
 {
@@ -18,9 +19,10 @@ namespace MoonKnight.Auth.Controllers
     {
         private readonly MoonKnightDbContext _context;
         private readonly JwtTokenGenerator _jwtTokenGenerator;
-        public AuthController(MoonKnightDbContext context, JwtTokenGenerator jwtTokenGenerator)
+        private readonly IMapper _mapper;
+        public AuthController(MoonKnightDbContext context, JwtTokenGenerator jwtTokenGenerator,IMapper mapper)
         {
-
+            _mapper = mapper;
             _context = context;
             _jwtTokenGenerator = jwtTokenGenerator;
         }
@@ -29,39 +31,30 @@ namespace MoonKnight.Auth.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
-            // Validate password
             if (registerDto.Password != registerDto.ConfirmPassword)
-            {
                 return BadRequest("Passwords do not match");
-            }
 
-            // Check if user already exists
             var existingUser = await _context.Users
-                .Where(u => u.Email == registerDto.Email)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(u => u.Email == registerDto.Email);
 
             if (existingUser != null)
-            {
                 return Conflict("User already exists");
-            }
 
-            // Hash the password using BCrypt
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
+            // Map RegisterDto to User (ignoring PasswordHash and TenantId)
+            var user = _mapper.Map<User>(registerDto);
 
-            // Create the user entity
-            var user = new User
-            {
-                Email = registerDto.Email,
-                PasswordHash = hashedPassword, // Store the hashed password
-                Role = registerDto.Role ?? "User" // Default to 'User' if no role is provided
-            };
+            // Hash the password manually
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
 
-            // Add the user to the database
+            // Assign TenantId manually (if applicable)
+            user.TenantId = Guid.NewGuid(); // Or assign proper tenant id here
+
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Registration successful" });
         }
+
 
         // Login endpoint
         [HttpPost("login")]
