@@ -4,7 +4,7 @@ using MoonKnight.Auth.Dtos;
 
 namespace MoonKnight.Auth.Mappings
 {
-    public class AuthMappingProfile: Profile
+    public class AuthMappingProfile : Profile
     {
         public AuthMappingProfile()
         {
@@ -12,12 +12,15 @@ namespace MoonKnight.Auth.Mappings
             CreateMap<User, UserDto>();
 
             // RegisterDto -> User (we will hash password separately)
-       
+
 
             // RegisterDto → User (we’ll still hash password separately)
             CreateMap<RegisterDto, User>()
                 .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
                   .ForMember(dest => dest.TenantId, opt => opt.Ignore());
+            CreateMap<ForgotPasswordDto, PasswordResetToken>()
+            .ForMember(dest => dest.Token, opt => opt.Ignore())
+            .ForMember(dest => dest.UserId, opt => opt.Ignore());
 
         }
     }

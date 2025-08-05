@@ -4,6 +4,7 @@ using MoonKnight.Auth.Configuration;
 using MoonKnight.Auth.Domain.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace MoonKnight.Auth.Infrastructures.Services
@@ -16,7 +17,16 @@ namespace MoonKnight.Auth.Infrastructures.Services
         {
             _jwtSettings = jwtOptions.Value;
         }
-
+        public RefreshToken GenerateRefreshToken()
+        {
+            var randomBytes = RandomNumberGenerator.GetBytes(64);
+            return new RefreshToken
+            {
+                Token = Convert.ToBase64String(randomBytes),
+                Expires = DateTime.UtcNow.AddDays(7),
+                Created = DateTime.UtcNow
+            };
+        }
         public string GenerateToken(User user)
         {
             var claims = new[]
@@ -26,6 +36,10 @@ namespace MoonKnight.Auth.Infrastructures.Services
             new Claim("role", user.Role),
             new Claim("tenantId", user.TenantId.ToString())
         };
+
+
+
+
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

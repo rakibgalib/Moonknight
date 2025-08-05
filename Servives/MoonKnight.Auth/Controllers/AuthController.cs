@@ -1,15 +1,16 @@
 ﻿// File: MoonKnight.Auth.Controllers/AuthController.cs
+using AutoMapper;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MoonKnight.Auth.Domain.Entities;
+using MoonKnight.Auth.Dtos;
 using MoonKnight.Auth.Dtos;
 using MoonKnight.Auth.Infrastructures.DbContexts;
-using MoonKnight.Auth.Domain.Entities;
-using System.Threading.Tasks;
-using System.Linq;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
-using MoonKnight.Auth.Dtos;
 using MoonKnight.Auth.Infrastructures.Services;
-using AutoMapper;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Threading.Tasks;
 
 namespace MoonKnight.Auth.Controllers
 {
@@ -61,25 +62,117 @@ namespace MoonKnight.Auth.Controllers
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             var user = await _context.Users
-                .Where(u => u.Email == loginDto.Email)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
 
             if (user == null)
-            {
-                return BadRequest(new ApiResponse<string>(false, "Invalid credentials"));
-            }
+                return Unauthorized("Invalid credentials");
 
-            // Verify the password using BCrypt
+            // Verify password using BCrypt
             if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
-            {
-                return BadRequest(new ApiResponse<string>(false, "Invalid credentials"));
-            }
-            var token = _jwtTokenGenerator.GenerateToken(user);
-            return Ok(new ApiResponse<string>(true, "Login successful", token));
+                return Unauthorized("Invalid credentials");
+            var existingTokens = _context.RefreshTokens
+                .Where(rt => rt.UserId == user.Id && rt.Revoked == null && rt.Expires > DateTime.UtcNow);
 
+            foreach (var token in existingTokens)
+            {
+                token.Revoked = DateTime.UtcNow;
+            }
+            await _context.SaveChangesAsync();
+
+            // Generate JWT token (assuming you have a JwtTokenGenerator service)
+            var accessToken = _jwtTokenGenerator.GenerateToken(user);
+            var refreshToken = _jwtTokenGenerator.GenerateRefreshToken();
+            refreshToken.UserId = user.Id;
+            await _context.RefreshTokens.AddAsync(refreshToken);
+            await _context.SaveChangesAsync();
+            return Ok(new
+            {
+                message = "Login successful",
+                accessToken,
+                refreshToken = refreshToken.Token
+            });
+           
+        }
+        [HttpPost("refresh")]
+        public async Task<IActionResult> RefreshToken([FromBody] string token)
+        {
+            var oldToken = await _context.RefreshTokens.Include(r => r.User)
+                    .FirstOrDefaultAsync(r => r.Token == token);
+
+            if (oldToken == null || !oldToken.IsActive)
+                return Unauthorized("Invalid refresh token");
+
+            oldToken.Revoked = DateTime.UtcNow;
+
+            var newRefresh = _jwtTokenGenerator.GenerateRefreshToken();
+            newRefresh.UserId = oldToken.UserId;
+            var newAccessToken = _jwtTokenGenerator.GenerateToken(oldToken.User);
+
+            await _context.RefreshTokens.AddAsync(newRefresh);
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                accessToken = newAccessToken,
+                refreshToken = newRefresh.Token
+            });
+        }
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromBody] string token)
+        {
+            var refreshToken = await _context.RefreshTokens.FirstOrDefaultAsync(x => x.Token == token);
+            if (refreshToken == null) return Ok();
+
+            refreshToken.Revoked = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Logged out" });
         }
 
-        // Utility to hash the password (you can replace this with a more secure method like BCrypt in production)
-       
+        [HttpPost("forgot")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == dto.Email);
+            if (user == null)
+                return Ok(new { message = "If an account exists, a reset link has been sent." });
+
+            // generate token
+            var resetToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+
+            // create entity using AutoMapper (optional) or manual:
+            var resetEntry = _mapper.Map<PasswordResetToken>(dto);
+            resetEntry.Token = resetToken;
+            resetEntry.UserId = user.Id;
+            resetEntry.Created = DateTime.UtcNow;
+            resetEntry.Expires = DateTime.UtcNow.AddHours(1);
+
+            await _context.PasswordResetTokens.AddAsync(resetEntry);
+            await _context.SaveChangesAsync();
+
+            // TODO: send resetEntry.Token to email
+            return Ok(new { message = "Reset link sent" });
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+        {
+            if (dto.NewPassword != dto.ConfirmPassword)
+                return BadRequest("Passwords do not match");
+
+            var tokenEntry = await _context.PasswordResetTokens
+                .Include(x => x.User)
+                .FirstOrDefaultAsync(x => x.Token == dto.ResetToken);
+
+            if (tokenEntry == null || tokenEntry.Used || tokenEntry.Expires < DateTime.UtcNow)
+                return BadRequest("Token expired/invalid");
+
+            // hash new password
+            tokenEntry.User.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+            tokenEntry.Used = true;
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Password reset successfully" });
+        }
+
     }
 }
