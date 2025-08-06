@@ -7,6 +7,7 @@ using MoonKnight.Auth.Domain.Entities;
 using MoonKnight.Auth.Dtos;
 using MoonKnight.Auth.Dtos;
 using MoonKnight.Auth.Infrastructures.DbContexts;
+using MoonKnight.Auth.Infrastructures.Interfaces.Services;
 using MoonKnight.Auth.Infrastructures.Services;
 using System.Linq;
 using System.Security.Cryptography;
@@ -19,12 +20,14 @@ namespace MoonKnight.Auth.Controllers
     public class AuthController : ControllerBase
     {
         private readonly MoonKnightDbContext _context;
-        private readonly JwtTokenGenerator _jwtTokenGenerator;
+        private readonly IJwtTokenGenerator _jwtTokenGenerator;
         private readonly IMapper _mapper;
-        public AuthController(MoonKnightDbContext context, JwtTokenGenerator jwtTokenGenerator,IMapper mapper)
+        private readonly IEmailServices _emailService;
+        public AuthController(MoonKnightDbContext context, IJwtTokenGenerator jwtTokenGenerator,IMapper mapper,IEmailServices emailService)
         {
             _mapper = mapper;
             _context = context;
+            _emailService = emailService;
             _jwtTokenGenerator = jwtTokenGenerator;
         }
 
@@ -49,9 +52,14 @@ namespace MoonKnight.Auth.Controllers
 
             // Assign TenantId manually (if applicable)
             user.TenantId = Guid.NewGuid(); // Or assign proper tenant id here
-
+            user.EmailVerificationToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+            user.EmailVerificationTokenExpires = DateTime.UtcNow.AddHours(24);
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
+            var verifyLink = $"https://localhost:5152/api/auth/verify-email?token={user.EmailVerificationToken}";
+            var message = $"Please click the following link to verify your email: <a href=\"{verifyLink}\">Verify</a>";
+
+            await _emailService.SendAsync(user.Email, "Email Verification", message);
 
             return Ok(new { message = "Registration successful" });
         }
@@ -66,7 +74,8 @@ namespace MoonKnight.Auth.Controllers
 
             if (user == null)
                 return Unauthorized("Invalid credentials");
-
+            if (!user.EmailConfirmed)
+                return Unauthorized("Email not confirmed");
             // Verify password using BCrypt
             if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
                 return Unauthorized("Invalid credentials");
@@ -174,5 +183,21 @@ namespace MoonKnight.Auth.Controllers
             return Ok(new { message = "Password reset successfully" });
         }
 
+
+        [HttpPost("verify-email")]
+        public async Task<IActionResult> VerifyEmail([FromBody] string token)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.EmailVerificationToken == token);
+
+            if (user == null || user.EmailVerificationTokenExpires < DateTime.UtcNow)
+                return BadRequest("Invalid or expired token");
+
+            user.EmailConfirmed = true;
+            user.EmailVerificationToken = null;
+            user.EmailVerificationTokenExpires = null;
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Email verified successfully" });
+        }
     }
 }

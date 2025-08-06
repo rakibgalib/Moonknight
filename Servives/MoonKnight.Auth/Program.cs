@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MoonKnight.Auth.Configuration;
 using MoonKnight.Auth.Domain.Interfaces;
 using MoonKnight.Auth.Infrastructures.DbContexts;
+using MoonKnight.Auth.Infrastructures.Interfaces.Services;
 using MoonKnight.Auth.Infrastructures.Repositories;
 using MoonKnight.Auth.Infrastructures.Services;
 using MoonKnight.Auth.Mappings;
@@ -10,7 +11,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<JwtTokenGenerator>();
+
+builder.Services.AddScoped<IEmailServices, EmailService>();
+builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

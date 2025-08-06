@@ -7,5 +7,8 @@
         public string PasswordHash { get; set; }
         public string Role { get; set; }  // e.g., Admin, Technician
         public Guid TenantId { get; set; }
+        public bool EmailConfirmed { get; set; } = false;
+        public string? EmailVerificationToken { get; set; }
+        public DateTime? EmailVerificationTokenExpires { get; set; }
     }
 }

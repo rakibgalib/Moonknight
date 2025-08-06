@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using MoonKnight.Auth.Configuration;
 using MoonKnight.Auth.Domain.Entities;
+using MoonKnight.Auth.Infrastructures.Interfaces.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -9,7 +10,7 @@ using System.Text;
 
 namespace MoonKnight.Auth.Infrastructures.Services
 {
-    public class JwtTokenGenerator
+    public class JwtTokenGenerator:IJwtTokenGenerator
     {
         private readonly JwtSettings _jwtSettings;
 
