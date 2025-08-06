@@ -2,6 +2,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using MoonKnight.Auth.Domain.Entities;
 using MoonKnight.Auth.Dtos;
@@ -64,7 +65,7 @@ namespace MoonKnight.Auth.Controllers
             return Ok(new { message = "Registration successful" });
         }
 
-
+        [EnableRateLimiting("login-policy")]
         // Login endpoint
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)

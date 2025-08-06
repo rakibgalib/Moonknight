@@ -10,7 +10,7 @@ namespace MoonKnight.Auth.Infrastructures.Services
         private readonly string _fromAddress;
         public EmailService(IConfiguration config)
         {
-            _fromAddress = config["Email:From"] ?? "no-reply@moonknight.com";
+            _fromAddress = config["Email:From"] ?? "7a9f93001@smtp-brevo.com";
 
             _smtp = new SmtpClient(config["Email:Smtp"], int.Parse(config["Email:Port"]))
             {
