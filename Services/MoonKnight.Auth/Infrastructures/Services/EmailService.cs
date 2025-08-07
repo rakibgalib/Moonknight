@@ -1,4 +1,4 @@
-﻿using MoonKnight.Auth.Infrastructures.Interfaces.Services;
+﻿using MoonKnight.Auth.Application.Interfaces;
 using System.Net;
 using System.Net.Mail;
 

@@ -1,6 +1,6 @@
 ﻿using MoonKnight.Auth.Domain.Entities;
 
-namespace MoonKnight.Auth.Domain.Interfaces
+namespace MoonKnight.Auth.Application.Interfaces
 {
     public interface IUserRepository
     {

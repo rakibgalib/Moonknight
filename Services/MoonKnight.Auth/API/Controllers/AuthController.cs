@@ -4,17 +4,16 @@ using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using MoonKnight.Auth.Application.Dtos;
+using MoonKnight.Auth.Application.Interfaces;
 using MoonKnight.Auth.Domain.Entities;
-using MoonKnight.Auth.Dtos;
-using MoonKnight.Auth.Dtos;
 using MoonKnight.Auth.Infrastructures.DbContexts;
-using MoonKnight.Auth.Infrastructures.Interfaces.Services;
 using MoonKnight.Auth.Infrastructures.Services;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
-namespace MoonKnight.Auth.Controllers
+namespace MoonKnight.Auth.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

@@ -1,6 +1,6 @@
 ﻿using MoonKnight.Auth.Domain.Entities;
 
-namespace MoonKnight.Auth.Infrastructures.Interfaces.Services
+namespace MoonKnight.Auth.Application.Interfaces
 {
     public interface IJwtTokenGenerator
     {

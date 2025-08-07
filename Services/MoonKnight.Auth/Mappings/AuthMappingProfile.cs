@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using MoonKnight.Auth.Application.Dtos;
 using MoonKnight.Auth.Domain.Entities;
-using MoonKnight.Auth.Dtos;
 
 namespace MoonKnight.Auth.Mappings
 {

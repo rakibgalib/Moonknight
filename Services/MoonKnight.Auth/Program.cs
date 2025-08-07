@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using MoonKnight.Auth.Configuration;
-using MoonKnight.Auth.Domain.Interfaces;
+using MoonKnight.Auth.Application.Interfaces;
+using MoonKnight.Auth.Infrastructures.Configuration;
 using MoonKnight.Auth.Infrastructures.DbContexts;
-using MoonKnight.Auth.Infrastructures.Interfaces.Services;
 using MoonKnight.Auth.Infrastructures.Repositories;
 using MoonKnight.Auth.Infrastructures.Services;
 using MoonKnight.Auth.Mappings;

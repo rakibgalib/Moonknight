@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MoonKnight.Identity.Application.Dtos.User;
 using MoonKnight.Identity.Domain.Entities;
-using MoonKnight.Identity.Dtos.User;
 using MoonKnight.Identity.Infrastructures.DbContexts;
 
-namespace MoonKnight.Identity.Controllers
+namespace MoonKnight.Identity.API.Controllers
 {
     [Authorize]   //
     [Route("api/[controller]")]

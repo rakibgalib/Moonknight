@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MoonKnight.Auth.Application.Interfaces;
 using MoonKnight.Auth.Domain.Entities;
-using MoonKnight.Auth.Domain.Interfaces;
 using MoonKnight.Auth.Infrastructures.DbContexts;
 
 namespace MoonKnight.Auth.Infrastructures.Repositories

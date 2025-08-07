@@ -1,4 +1,4 @@
-﻿namespace MoonKnight.Auth.Infrastructures.Interfaces.Services
+﻿namespace MoonKnight.Auth.Application.Interfaces
 {
     public interface IEmailServices
     {

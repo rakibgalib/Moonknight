@@ -1,4 +1,4 @@
-﻿namespace MoonKnight.Auth.Configuration
+﻿namespace MoonKnight.Auth.Infrastructures.Configuration
 {
     public class JwtSettings
     {

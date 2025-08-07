@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using MoonKnight.Identity.Application.Dtos.User;
 using MoonKnight.Identity.Domain.Entities;
-using MoonKnight.Identity.Dtos.User;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MoonKnight.Identity.Mapping

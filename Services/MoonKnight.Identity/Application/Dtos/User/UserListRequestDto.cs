@@ -1,4 +1,4 @@
-﻿namespace MoonKnight.Identity.Dtos.User
+﻿namespace MoonKnight.Identity.Application.Dtos.User
 {
     public class UserListRequestDto
     {

@@ -1,4 +1,4 @@
-﻿namespace MoonKnight.Auth.Dtos
+﻿namespace MoonKnight.Auth.Application.Dtos
 {
     public class RegisterDto
     {

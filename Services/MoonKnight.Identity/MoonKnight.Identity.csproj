@@ -16,9 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Domain\Interfaces\" />
-    <Folder Include="Dtos\" />
-    <Folder Include="Infrastructures\Services\" />
+    <Folder Include="Application\Interfaces\" />
+    <Folder Include="Application\Dtos\" />
+    <Folder Include="Application\Services\" />
     <Folder Include="Infrastructures\Repositories\" />
     <Folder Include="Mapping\" />
   </ItemGroup>
